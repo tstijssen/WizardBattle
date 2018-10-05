@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+// contains list of available moves from tile xy
 public struct sMovePath
 {
 	public List<TileManager> m_AvailableMoves;
@@ -10,10 +11,10 @@ public struct sMovePath
 
 public class WizardAI : MonoBehaviour {
 
-	public PlayerControl m_PlayerControl;
-	public PlayerControl m_Opponent;
-	public GameObject m_IceSpell, m_FireSpell;
-	public float m_Delay;
+	public PlayerControl m_PlayerControl;	// reference to controls
+	public PlayerControl m_Opponent;	// reference to other player
+	public GameObject m_IceSpell, m_FireSpell;	// AI uses seperate activator for spells (does not show menu)
+	public float m_Delay;	// delay for going to the casting state (so that player can keep up with AI)
 
 	IEnumerator DelayAI()
 	{
@@ -21,6 +22,7 @@ public class WizardAI : MonoBehaviour {
 		CalculateSpell ();
 	}
 
+	// calculate possible moves from tile xy
 	sMovePath GetPossibleMoves(int x, int y)
 	{
 		sMovePath newPath;
@@ -28,6 +30,7 @@ public class WizardAI : MonoBehaviour {
 		newPath.y = y;
 		newPath.m_AvailableMoves = new List<TileManager>();
 
+		// same as in player control, check for bounds and valid tiles in all 4 directions
 		int movementValue = m_PlayerControl.m_TileMap [y].m_Tiles [x].GetComponent<TileManager>().m_Value;
 		if (x + movementValue < 5 && 
 			!m_PlayerControl.m_TileMap [y].m_Tiles [x + movementValue].GetComponent<TileManager>().m_Player &&
@@ -61,6 +64,7 @@ public class WizardAI : MonoBehaviour {
 		return newPath;
 	}
 
+	// movement state
 	public void CalculateMove()
 	{
 		//calculate possible moves
@@ -84,6 +88,7 @@ public class WizardAI : MonoBehaviour {
 			m_MoveList.Add(GetPossibleMoves((int)tile.transform.position.x, (int)tile.transform.position.y));
 		}
 		
+		// sort list so that movement with most options next turn is first in the list
 		m_MoveList.Sort(delegate(sMovePath x, sMovePath y) {
 			return x.m_AvailableMoves.Count - y.m_AvailableMoves.Count;
 		}
@@ -95,6 +100,7 @@ public class WizardAI : MonoBehaviour {
 		StartCoroutine (DelayAI());
 	}
 
+	// casting state
 	void CalculateSpell()
 	{
 		// calculate opponents possible moves
