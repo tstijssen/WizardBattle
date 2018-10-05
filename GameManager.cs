@@ -4,20 +4,23 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
+// denotes whose current turn it is
 public enum ePlayerPriority{PlayerOne, PlayerTwo};
 
+// main manager for game behaviour
 public class GameManager : MonoBehaviour {
 
-	int m_AIGame;
+	int m_AIGame; // int value used to determine whether this game contains an ai (uses player prefs)
 
+	// references to players and UI animations
 	public PlayerControl m_PlayerOne, m_PlayerTwo;
 	public GameObject m_TurnTorchOne, m_TurnTorchTwo;
 	public GameObject m_Player1Idle, m_Player1Victory, m_Player1Death;
 	public GameObject m_Player2Idle, m_Player2Victory, m_Player2Death;
 	public ePlayerPriority m_Turn;
-	public Text m_TurnText;
+	public Text m_TurnText;	// top screen text
 
-	public WizardAI m_AI;
+	public WizardAI m_AI;	// reference to ai
 
 	public AudioClip m_FireSound, m_IceSound, m_VictorySound, m_ButtonSound;
 	private AudioSource m_AudioSource;
@@ -26,13 +29,15 @@ public class GameManager : MonoBehaviour {
 	void Start () {
 		m_AudioSource = GetComponent<AudioSource> ();
 		m_AIGame = PlayerPrefs.GetInt("AIActive");
-		// roll for player initiative, 0-3 = player 1, 4-6 = player 2
 
+		// perform starting value setup for players
 		m_PlayerOne.Setup ();
 		m_PlayerTwo.Setup ();
 
+		// roll for player initiative, 0-3 = player 1, 4-6 = player 2
 		int roll = Random.Range (0, 7);
 
+		// activate movement state for current player
 		if (roll > 3) 
 		{
 			m_Turn = ePlayerPriority.PlayerTwo;
